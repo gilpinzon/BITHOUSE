@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BITHOUSE | Menú Digital & Pedidos en Mesa y Domicilio</title>
+  <meta name="description" content="Menú digital oficial BITHOUSE Los Robles. Pide para comer en mesa o a domicilio con WhatsApp. Salvajadas, salchipapas, perros, burgers y más.">
+  
+  <!-- Google Fonts: Bebas Neue + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bithouse: {
+              yellow: '#FFB800',
+              amber: '#F59E0B',
+              orange: '#FF5400',
+              red: '#E50914',
+              dark: '#080808',
+              card: '#121212',
+              border: '#242424'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080808; color: #F5F5F4; }
+    .neon-glow-gold { box-shadow: 0 0 30px -4px rgba(245, 158, 11, 0.4); }
+    .neon-text-gold { text-shadow: 0 0 16px rgba(245, 158, 11, 0.6); }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #0f0f0f; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+    .hero-img-transition { transition: opacity 0.28s ease, transform 0.35s ease; }
+    .btn-press:active { transform: scale(0.96); }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- BARRA DE ADMINISTRADOR ACTIVA (SOLO VISIBLE CUANDO INICIA SESIÓN COMO ADMIN) -->
+  <div id="adminTopBar" class="hidden bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 text-black px-4 py-2 font-bold text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 shadow-xl z-50">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-black animate-ping"></span>
+      <span class="font-black uppercase tracking-wider">MODO ADMINISTRADOR ACTIVO</span>
+      <span class="text-neutral-900 hidden sm:inline">• Puedes editar precios, fotos y platos en vivo</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openProductEditModal()" class="px-2.5 py-1 rounded bg-black text-amber-400 text-xs font-black hover:bg-neutral-900 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-plus"></i> Agregar Nuevo Plato
+      </button>
+      <button onclick="resetMenuToDefault()" class="px-2.5 py-1 rounded bg-neutral-900 text-white text-xs font-bold hover:bg-black transition">
+        Restablecer Menú
+      </button>
+      <button onclick="logoutAdmin()" class="px-2.5 py-1 rounded bg-white text-red-700 text-xs font-black hover:bg-neutral-200 transition">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Salir
+      </button>
+    </div>
+  </div>
+
+  <!-- TOP PROMO TICKER -->
+  <div class="bg-gradient-to-r from-amber-500 via-orange-600 to-red-600 text-black text-xs sm:text-sm font-black py-2 px-4 text-center tracking-wide flex items-center justify-center gap-2 shadow-lg">
+    <span class="animate-pulse">🔥</span>
+    <span>¡BIENVENIDO A BITHOUSE! Menú Digital Los Robles</span>
+    <span class="hidden md:inline">• Pide en Mesa o a Domicilio</span>
+    <span class="hidden lg:inline">• WhatsApp: 314 609 6158</span>
+    <span class="animate-pulse">🔥</span>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-40 bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+      
+      <!-- LOGO BITHOUSE -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-burger text-black text-2xl font-black"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display text-2xl sm:text-3xl text-white tracking-wider group-hover:text-amber-400 transition-colors">
+              BITHOUSE
+            </span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500 text-black uppercase">
+              _CO
+            </span>
+          </div>
+          <p class="text-[11px] text-neutral-400 font-medium">
+            Fast Food · Los Robles
+          </p>
+        </div>
+      </a>
+
+      <!-- SWITCH RÁPIDO DE MODALIDAD (MESA VS DOMICILIO) EN NAVBAR -->
+      <div class="hidden md:flex items-center bg-neutral-900 border border-neutral-800 rounded-2xl p-1 gap-1">
+        <button 
+          id="navBtnMesa" 
+          type="button" 
+          onclick="setConsumptionMode('mesa')"
+          class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition transition-all bg-amber-500 text-black shadow"
+        >
+          <i class="fa-solid fa-utensils"></i>
+          <span>En Mesa</span>
+        </button>
+        <button 
+          id="navBtnDomicilio" 
+          type="button" 
+          onclick="setConsumptionMode('domicilio')"
+          class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center gap-1.5 transition"
+        >
+          <i class="fa-solid fa-motorcycle"></i>
+          <span>Para Llevar / Domicilio</span>
+        </button>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN (LOGIN ADMIN & CARRITO) -->
+      <div class="flex items-center gap-2.5">
+        <!-- Botón Rol Administrador -->
+        <button 
+          id="btnAdminAuth"
+          type="button" 
+          onclick="handleAdminAuthClick()"
+          class="px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-amber-400 border border-neutral-800 text-xs font-bold flex items-center gap-1.5 transition btn-press"
+          title="Acceso Administrador"
+        >
+          <i class="fa-solid fa-lock text-xs"></i>
+          <span class="hidden sm:inline" id="adminBtnText">Admin</span>
+        </button>
+
+        <!-- Botón Carrito -->
+        <button 
+          type="button" 
+          onclick="toggleCart(true)"
+          class="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm transition shadow-lg shadow-amber-500/20 btn-press"
+        >
+          <i class="fa-solid fa-cart-shopping text-base"></i>
+          <span class="hidden sm:inline">Tu Pedido</span>
+          <span 
+            id="cartCountBadge" 
+            class="hidden w-5 h-5 rounded-full bg-black text-amber-400 text-[11px] font-black flex items-center justify-center"
+          >
+            0
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SELECTOR FLOTANTE / DESTACADO DE MODALIDAD DE CONSUMO -->
+  <section class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="bg-gradient-to-r from-neutral-900 via-neutral-900/90 to-neutral-900 border border-neutral-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-3.5 text-left w-full md:w-auto">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl flex-shrink-0">
+          <i id="modeIconBanner" class="fa-solid fa-utensils"></i>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-black text-amber-400 tracking-wider block">¿Cómo deseas disfrutar tu pedido?</span>
+          <h3 id="modeTitleBanner" class="text-white font-bold text-sm sm:text-base">
+            Comer en el Local (En Mesa)
+          </h3>
+          <p id="modeDescBanner" class="text-neutral-400 text-xs">
+            Seleccionado: Te atenderemos directamente en tu mesa.
+          </p>
+        </div>
+      </div>
+
+      <!-- Selector tipo Switcher Interactivo -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto">
+        <div class="grid grid-cols-2 p-1 bg-black rounded-2xl border border-neutral-800">
+          <button 
+            type="button" 
+            onclick="setConsumptionMode('mesa')"
+            id="switchBtnMesa"
+            class="px-4 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition bg-amber-500 text-black shadow-lg"
+          >
+            <i class="fa-solid fa-chair"></i>
+            <span>En Mesa</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="setConsumptionMode('domicilio')"
+            id="switchBtnDomicilio"
+            class="px-4 py-2.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center justify-center gap-2 transition"
+          >
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Para Llevar / Domicilio</span>
+          </button>
+        </div>
+
+        <!-- Input dinámico según la modalidad -->
+        <div id="tableInputContainer" class="flex items-center bg-black border border-neutral-700 rounded-2xl px-3 py-2">
+          <i class="fa-solid fa-hashtag text-amber-400 mr-2 text-xs"></i>
+          <input 
+            type="text" 
+            id="globalTableNumber" 
+            placeholder="N° de Mesa (Ej: 4)" 
+            class="bg-transparent text-xs text-white placeholder-neutral-500 font-bold focus:outline-none w-28"
+            oninput="updateGlobalTableNumber(this.value)"
+          />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN HERO: VISUALIZADOR DINÁMICO DE PLATO SELECCIONADO -->
+    <!-- ======================================================== -->
+    <section id="heroSpotlight" class="relative rounded-3xl overflow-hidden bg-neutral-900/90 border border-amber-500/40 neon-glow-gold transition-all duration-300">
+      
+      <!-- Fondo con glow sutil -->
+      <div class="absolute -top-24 -left-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Barra superior informativa -->
+      <div class="border-b border-neutral-800 bg-black/50 px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2 text-neutral-300">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span class="font-extrabold uppercase tracking-wider text-amber-400">Plato Seleccionado en Vista Previa</span>
+          <span class="text-neutral-600 hidden sm:inline">•</span>
+          <span class="text-neutral-400 hidden sm:inline">Haz clic en cualquier producto abajo para cambiar esta vista</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <!-- Botón de Editar si es Admin -->
+          <button 
+            id="heroEditBtn" 
+            onclick="editCurrentHeroProduct()" 
+            class="hidden px-2.5 py-1 rounded-lg bg-amber-500 text-black text-xs font-black hover:bg-amber-400 flex items-center gap-1.5 transition"
+          >
+            <i class="fa-solid fa-pen-to-square"></i> Editar Plato
+          </button>
+          <span class="text-[11px] text-neutral-400"><i class="fa-solid fa-camera text-amber-400 mr-1"></i> Foto de Alta Calidad</span>
+        </div>
+      </div>
+
+      <!-- Grid 2 Columnas: Imagen Alta Calidad + Detalles y Pedido -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-8 lg:p-10 items-center">
+        
+        <!-- Columna Izquierda: Foto Grande del Plato -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+          <div class="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-2xl overflow-hidden bg-black border border-neutral-800 shadow-2xl group">
+            
+            <!-- Spinner al cambiar de plato -->
+            <div id="heroSpinner" class="hidden absolute inset-0 z-20 bg-black/75 backdrop-blur-sm flex items-center justify-center">
+              <div class="flex flex-col items-center gap-2">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-amber-400"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-neutral-300">Cargando delicia...</span>
+              </div>
+            </div>
+
+            <!-- Imagen Principal -->
+            <img 
+              id="heroImage" 
+              src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop" 
+              alt="Plato BITHOUSE" 
+              class="w-full h-full object-cover hero-img-transition group-hover:scale-105 duration-700 select-none"
+            />
+
+            <!-- Gradiente decorativo -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/20 pointer-events-none"></div>
+
+            <!-- Badge Superior en Foto -->
+            <div class="absolute top-4 left-4 z-10 flex gap-2">
+              <span id="heroCategoryBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500 text-black shadow">
+                Salvajadas
+              </span>
+              <span id="heroBadgeTag" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur bg-black/70 border border-white/20 text-white shadow">
+                Para 4 Personas
+              </span>
+            </div>
+
+            <!-- Barra inferior sobre la imagen -->
+            <div class="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-xs">
+              <span id="heroPortion" class="px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur border border-neutral-700 text-neutral-200 font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-users text-amber-400"></i> <span>Comen 4 personas</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur border border-amber-500/40 text-amber-400 font-black flex items-center gap-1">
+                <i class="fa-solid fa-star"></i> <span>4.9 / 5.0</span>
+              </span>
+            </div>
+
+          </div>
+          <p class="text-[11px] text-neutral-500 mt-2 text-center">
+            * Fotografía referencial de alta calidad. Salsas de la casa y papa chongo incluidas según la receta original.
+          </p>
+        </div>
+
+        <!-- Columna Derecha: Información, Precio y Botón de Pedido WhatsApp -->
+        <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+          
+          <div>
+            <span id="heroSubcategory" class="text-xs uppercase font-extrabold text-amber-400 tracking-widest block mb-1">
+              ESPECIALIDAD BITHOUSE
+            </span>
+            <h1 id="heroTitle" class="font-display text-4xl sm:text-5xl text-white tracking-wide leading-none mb-3">
+              LA TRAMACUA
+            </h1>
+            <p id="heroDescription" class="text-neutral-300 text-sm sm:text-base leading-relaxed mb-6 font-normal">
+              Butifarra, chorizo, pollo, carne, salchicha, papas francesas, queso mozarella fundido, tocineta, lechuga, cebolla, salsa de tocineta y salsas de la casa.
+            </p>
+
+            <!-- Tags de Ingredientes Clave -->
+            <div class="space-y-2 mb-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group"></i> Ingredientes & Preparación:
+              </span>
+              <div id="heroIngredientsChips" class="flex flex-wrap gap-1.5">
+                <!-- Se inyecta dinámicamente -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Caja de Precio y Botones de Compra -->
+          <div class="pt-6 border-t border-neutral-800 space-y-4">
+            
+            <div class="flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase font-bold text-neutral-400 tracking-wider block">Precio del Plato</span>
+                <div class="flex items-baseline gap-2">
+                  <span id="heroPrice" class="font-display text-4xl sm:text-5xl text-amber-400 tracking-tight neon-text-gold">
+                    $ 54.000
+                  </span>
+                  <span class="text-xs font-bold text-neutral-400">COP</span>
+                </div>
+              </div>
+
+              <!-- Selector Cantidad -->
+              <div class="flex items-center bg-black border border-neutral-700 rounded-xl p-1">
+                <button 
+                  type="button" 
+                  onclick="changeHeroQty(-1)"
+                  class="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white flex items-center justify-center font-bold btn-press"
+                >
+                  <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <span id="heroQty" class="w-10 text-center font-black text-lg text-white">1</span>
+                <button 
+                  type="button" 
+                  onclick="changeHeroQty(1)"
+                  class="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white flex items-center justify-center font-bold btn-press"
+                >
+                  <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Indicador visual de la modalidad en el Hero -->
+            <div id="heroModeBadge" class="p-2.5 rounded-xl bg-black/60 border border-neutral-800 flex items-center justify-between text-xs text-neutral-300">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-bell-concierge text-amber-400"></i>
+                <span id="heroModeLabelText">Modalidad: <strong>En Mesa</strong></span>
+              </span>
+              <button onclick="document.getElementById('switchBtnDomicilio').click()" class="text-amber-400 hover:underline text-[11px] font-bold">
+                Cambiar
+              </button>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              
+              <!-- Botón Primario: Pedir por WhatsApp -->
+              <button 
+                id="heroWhatsAppBtn"
+                type="button" 
+                onclick="orderCurrentHeroWhatsApp()"
+                class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/25 btn-press transition"
+              >
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span>Pedir por WhatsApp</span>
+              </button>
+
+              <!-- Botón Secundario: Añadir al Pedido (Carrito) -->
+              <button 
+                type="button" 
+                onclick="addCurrentHeroToCart()"
+                class="w-full py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/20 btn-press transition"
+              >
+                <i class="fa-solid fa-cart-plus text-lg"></i>
+                <span>Añadir al Pedido</span>
+              </button>
+            </div>
+
+            <div class="text-[11px] text-neutral-400 flex items-center justify-center gap-3 pt-1">
+              <span><i class="fa-solid fa-check text-emerald-400 mr-1"></i> WhatsApp: 314 609 6158</span>
+              <span>•</span>
+              <span><i class="fa-solid fa-qrcode text-amber-400 mr-1"></i> Pagos por Nequi</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN MENÚ: CATEGORÍAS Y TARJETAS COMPLETAS DEL PDF    -->
+    <!-- ======================================================== -->
+    <section class="space-y-6">
+      
+      <!-- Encabezado Menú -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-800 pb-5">
+        <div>
+          <span class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider">
+            Catálogo Oficial BITHOUSE
+          </span>
+          <h2 class="font-display text-4xl sm:text-5xl text-white tracking-wide mt-1">
+            EXPLORA NUESTRA CARTA
+          </h2>
+          <p class="text-neutral-400 text-sm max-w-xl">
+            Haz clic en cualquier plato para verlo en el visor superior, o pulsa <strong>"Pedir por WhatsApp"</strong> directamente en la tarjeta.
+          </p>
+        </div>
+
+        <div class="text-xs text-neutral-400 bg-neutral-900 border border-neutral-800 px-3.5 py-2 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-filter text-amber-400"></i>
+          <span id="categoryCountBadge">Mostrando todos los platos</span>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros por Categoría (Scroll horizontal) -->
+      <div id="categoryTabsContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <!-- Generado por JS -->
+      </div>
+
+      <!-- Grid de Tarjetas del Menú -->
+      <div id="menuCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Generado por JS -->
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- INFORMACIÓN DE PAGOS NEQUI & CONTACTO                    -->
+    <!-- ======================================================== -->
+    <section class="rounded-3xl bg-neutral-900/60 border border-neutral-800 p-6 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+      
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-purple-900/40 border border-purple-500/30 text-purple-300 flex items-center justify-center text-2xl flex-shrink-0">
+          <i class="fa-solid fa-qrcode"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase font-extrabold text-purple-400 tracking-wider">Medios de Pago</span>
+          <h4 class="font-bold text-white text-base">NEQUI</h4>
+          <p class="text-xs text-neutral-300">Bithouse Co Maria Bolanos</p>
+          <p class="text-xs font-mono font-bold text-amber-400">LLAVE: 0091430058</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl flex-shrink-0">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase font-extrabold text-amber-400 tracking-wider">Ubicación</span>
+          <h4 class="font-bold text-white text-base">Sede Los Robles</h4>
+          <p class="text-xs text-neutral-300">Carrera 21A #77D-19</p>
+          <p class="text-xs text-neutral-400">Atención en mesa y a domicilio</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0">
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Línea de Pedidos</span>
+          <h4 class="font-bold text-white text-base">314 609 6158</h4>
+          <p class="text-xs text-neutral-300">5:00 P.M. - 11:30 P.M.</p>
+          <a href="https://wa.me/573146096158" target="_blank" class="text-xs font-bold text-emerald-400 hover:underline">Chatear con el local →</a>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- SLIDE-OVER DRAWER: CARRITO DE COMPRAS                    -->
+  <!-- ======================================================== -->
+  <div 
+    id="cartBackdrop" 
+    onclick="toggleCart(false)"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 transition-opacity duration-300 hidden opacity-0"
+  ></div>
+
+  <aside 
+    id="cartDrawer" 
+    class="fixed top-0 right-0 h-full w-full max-w-md bg-neutral-950 border-l border-neutral-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl"
+  >
+    <div class="p-5 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/80">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-white">Tu Pedido BITHOUSE</h3>
+          <span class="text-xs text-neutral-400">Revisa tus platos antes de enviar</span>
+        </div>
+      </div>
+      <button 
+        type="button" 
+        onclick="toggleCart(false)"
+        class="w-9 h-9 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 flex items-center justify-center transition"
+      >
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Selector de Modalidad dentro del Carrito -->
+    <div class="p-4 bg-neutral-900/60 border-b border-neutral-850">
+      <span class="text-[11px] font-bold uppercase text-amber-400 tracking-wider block mb-2">Modalidad de tu Orden</span>
+      <div class="grid grid-cols-2 gap-2 bg-black p-1 rounded-xl border border-neutral-800">
+        <button 
+          id="cartModeBtnMesa"
+          type="button" 
+          onclick="setConsumptionMode('mesa')"
+          class="py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition bg-amber-500 text-black"
+        >
+          <i class="fa-solid fa-chair"></i> En Mesa
+        </button>
+        <button 
+          id="cartModeBtnDomicilio"
+          type="button" 
+          onclick="setConsumptionMode('domicilio')"
+          class="py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition text-neutral-400 hover:text-white"
+        >
+          <i class="fa-solid fa-motorcycle"></i> Domicilio / Llevar
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista Items Carrito -->
+    <div class="flex-1 overflow-y-auto p-5 space-y-3">
+      
+      <div id="cartEmptyState" class="hidden text-center py-16 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mx-auto text-neutral-600 text-2xl">
+          <i class="fa-solid fa-burger"></i>
+        </div>
+        <p class="text-base font-bold text-white">Tu carrito está vacío</p>
+        <p class="text-xs text-neutral-400 max-w-xs mx-auto">
+          Selecciona una salvajada, perro o hamburguesa del menú para armar tu orden.
+        </p>
+        <button 
+          type="button" 
+          onclick="toggleCart(false)"
+          class="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs"
+        >
+          Ver Platos
+        </button>
+      </div>
+
+      <div id="cartItemsList" class="space-y-3"></div>
+
+      <!-- Datos del Cliente (Adaptativo según Mesa o Domicilio) -->
+      <div class="pt-4 border-t border-neutral-850 space-y-3">
+        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block flex items-center gap-1.5">
+          <i id="cartFormIcon" class="fa-solid fa-utensils"></i>
+          <span id="cartFormTitle">Datos para atención en mesa</span>
+        </span>
+        
+        <input 
+          type="text" 
+          id="clientName" 
+          placeholder="Nombre del cliente o quién pide" 
+          class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+        />
+
+        <!-- Campo si es MESA -->
+        <div id="cartFieldMesa" class="space-y-1">
+          <input 
+            type="text" 
+            id="clientTable" 
+            placeholder="Número de Mesa (Ejemplo: Mesa 3)" 
+            class="w-full bg-neutral-900 border border-amber-500/50 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 font-bold placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+            oninput="syncTableInput(this.value)"
+          />
+        </div>
+
+        <!-- Campo si es DOMICILIO -->
+        <div id="cartFieldDomicilio" class="hidden space-y-1">
+          <input 
+            type="text" 
+            id="clientAddress" 
+            placeholder="Dirección exacta, Barrio y Torre/Apto" 
+            class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <select 
+            id="clientPayment"
+            class="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+          >
+            <option value="Nequi (0091430058)">Nequi</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+          </select>
+          <input 
+            type="text" 
+            id="clientNotes" 
+            placeholder="Notas (sin cebolla, salsas extras...)" 
+            class="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+          />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Totales y Botón Enviar WhatsApp -->
+    <div class="p-5 border-t border-neutral-800 bg-neutral-900/90 space-y-3">
+      <div class="flex justify-between items-center text-sm">
+        <span class="text-neutral-400">Total a pagar:</span>
+        <span id="cartGrandTotal" class="text-2xl font-black text-amber-400">$ 0</span>
+      </div>
+
+      <button 
+        id="cartCheckoutBtn"
+        type="button" 
+        onclick="checkoutCartWhatsApp()"
+        class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 btn-press transition"
+      >
+        <i class="fa-brands fa-whatsapp text-xl"></i>
+        <span>Enviar Pedido a WhatsApp</span>
+      </button>
+      <p class="text-[10px] text-center text-neutral-500">
+        El mensaje especificará claramente si la orden es para <strong>Mesa</strong> o <strong>Domicilio</strong>.
+      </p>
+    </div>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: LOGIN DE ADMINISTRADOR (PIN DE SEGURIDAD)        -->
+  <!-- ======================================================== -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
+      <button onclick="closeAdminAuthModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-bold text-white">Acceso de Administrador</h3>
+        <p class="text-xs text-neutral-400 mt-1">
+          Ingresa el PIN de seguridad para editar precios, fotos y platos de BITHOUSE.
+        </p>
+      </div>
+
+      <div>
+        <input 
+          type="password" 
+          id="adminPinInput" 
+          placeholder="PIN (Por defecto: 1234)" 
+          maxlength="8"
+          class="w-full text-center bg-black border border-neutral-700 rounded-2xl py-3 text-lg font-black tracking-widest text-amber-400 placeholder-neutral-600 focus:outline-none focus:border-amber-500"
+          onkeydown="if(event.key==='Enter') submitAdminPin()"
+        />
+        <span id="adminPinError" class="text-red-400 text-xs font-bold hidden block mt-2">
+          PIN incorrecto. Intenta de nuevo.
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button 
+          type="button" 
+          onclick="closeAdminAuthModal()" 
+          class="py-2.5 px-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          onclick="submitAdminPin()" 
+          class="py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black"
+        >
+          Ingresar
+        </button>
+      </div>
+
+      <p class="text-[10px] text-neutral-500">
+        * PIN predeterminado: <strong class="text-neutral-400">1234</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDITOR DE PRODUCTO (SOLO ADMIN)                   -->
+  <!-- ======================================================== -->
+  <div id="productEditModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-amber-400"></i>
+          <h3 id="editModalTitle" class="font-bold text-white text-base">Editar Plato</h3>
+        </div>
+        <button onclick="closeProductEditModal()" class="text-neutral-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="editProductId" />
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1">Nombre del Plato:</label>
+          <input type="text" id="editProductName" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Precio (en COP):</label>
+            <input type="number" id="editProductPrice" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-amber-400 font-black focus:outline-none focus:border-amber-500" />
+          </div>
+
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Categoría:</label>
+            <select id="editProductCategory" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="salvajadas">Salvajadas</option>
+              <option value="salchipapas">Salchipapas</option>
+              <option value="hotdogs">Hot Dogs</option>
+              <option value="burgers">Burgers</option>
+              <option value="patacones">Patacones</option>
+              <option value="burritos">Burritos</option>
+              <option value="asados">Asados</option>
+              <option value="arepas">Arepas Rellenas</option>
+              <option value="chuzos">Chuzos Desgranados</option>
+              <option value="alitas">Alitas</option>
+              <option value="combos">Combos</option>
+              <option value="bebidas">Bebidas</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1">URL de la Imagen (Unsplash o enlace directo):</label>
+          <input type="url" id="editProductImage" oninput="previewEditImage(this.value)" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500" placeholder="https://..." />
+          <div class="mt-2 h-32 rounded-xl bg-black border border-neutral-800 overflow-hidden relative">
+            <img id="editImagePreview" src="" alt="Vista Previa" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=900&auto=format&fit=crop'" />
+            <span class="absolute bottom-1 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] text-neutral-400">Vista Previa de Foto</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1">Porciones / Ración:</label>
+          <input type="text" id="editProductPortion" placeholder="Ej: 1 Persona / Comen 4 personas" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1">Descripción / Ingredientes detallados:</label>
+          <textarea id="editProductDesc" rows="3" class="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-neutral-800">
+        <button type="button" onclick="closeProductEditModal()" class="px-4 py-2 rounded-xl bg-neutral-800 text-neutral-300 text-xs font-bold hover:bg-neutral-700">
+          Cancelar
+        </button>
+        <button type="button" onclick="saveProductEdit()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black shadow-lg">
+          Guardar Cambios
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BARRA MÓVIL FLOTANTE -->
+  <div class="sm:hidden fixed bottom-4 left-4 right-4 z-40">
+    <button 
+      type="button" 
+      onclick="toggleCart(true)"
+      class="w-full py-3.5 px-5 rounded-2xl bg-amber-500 text-black font-extrabold text-sm flex items-center justify-between shadow-2xl shadow-black border border-amber-400 active:scale-95 transition"
+    >
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-bag-shopping text-base"></i>
+        <span>Ver Mi Pedido</span>
+        <span id="cartCountMobile" class="hidden px-2 py-0.5 rounded-full bg-black text-amber-400 text-xs font-black">0</span>
+      </div>
+      <span class="text-xs uppercase font-black">Abrir Carrito →</span>
+    </button>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-2 max-w-sm pointer-events-none"></div>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-neutral-900 text-neutral-400 text-xs mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-display text-2xl text-white tracking-wider">BITHOUSE</span>
+            <span class="px-2 py-0.5 rounded bg-amber-500 text-black text-[10px] font-black">_CO</span>
+          </div>
+          <p class="text-xs text-neutral-400 leading-relaxed mb-3">
+            El sabor callejero auténtico con las mejores combinaciones: salchipapas, salvajadas monstruosas, perros calientes, patacones y burgers en Los Robles.
+          </p>
+          <div class="flex items-center gap-3">
+            <a href="https://instagram.com/bithouse_co" target="_blank" class="w-8 h-8 rounded-lg bg-neutral-900 hover:bg-amber-500 hover:text-black flex items-center justify-center transition">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a href="https://facebook.com/bithouse_co" target="_blank" class="w-8 h-8 rounded-lg bg-neutral-900 hover:bg-amber-500 hover:text-black flex items-center justify-center transition">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="https://tiktok.com/@bithouse.co" target="_blank" class="w-8 h-8 rounded-lg bg-neutral-900 hover:bg-amber-500 hover:text-black flex items-center justify-center transition">
+              <i class="fa-brands fa-tiktok"></i>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white text-sm mb-3 uppercase tracking-wider">Horario & Atención</h4>
+          <ul class="space-y-1.5 text-xs text-neutral-400">
+            <li><strong class="text-white">Horario:</strong> 5:00 P.M. - 23:30 P.M.</li>
+            <li><strong class="text-white">Combos Especiales:</strong> Disponibles solo martes a jueves</li>
+            <li><strong class="text-white">WhatsApp Pedidos:</strong> +57 314 609 6158</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-white text-sm mb-3 uppercase tracking-wider">Sede & Pagos</h4>
+          <ul class="space-y-1.5 text-xs text-neutral-400">
+            <li><i class="fa-solid fa-location-dot text-amber-500 mr-1.5"></i> Carrera 21A #77D-19 Los Robles</li>
+            <li><i class="fa-solid fa-qrcode text-purple-400 mr-1.5"></i> Nequi: 0091430058 (María Bolaños)</li>
+            <li><i class="fa-solid fa-motorcycle text-amber-500 mr-1.5"></i> Domicilios en toda la zona</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-neutral-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-neutral-600 text-[11px]">
+        <p>© 2026 BITHOUSE. Menú digital oficial para pedidos en Mesa y a Domicilio.</p>
+        <button onclick="handleAdminAuthClick()" class="hover:text-amber-400 underline transition">
+          Panel de Administración (Dueño)
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: LÓGICA, ROLES, MODALIDAD Y LOCALSTORAGE      -->
+  <!-- ======================================================== -->
+  <script>
+    // CATÁLOGO BASE POR DEFECTO
+    const DEFAULT_MENU = [
+      // --- SALVAJADAS ---
+      {
+        id: "salvajada-currambera",
+        name: "Currambera Para Dos (x2)",
+        category: "salvajadas",
+        categoryName: "Salvajadas",
+        price: 34000,
+        portion: "Comen 2 Personas",
+        badge: "Para Compartir",
+        desc: "Papas a la francesa, Butifarra, chorizo, carne, pollo y cerdo, queso mozzarella fundido, lechuga, cebolla, tocineta, salsa de la casa y papa chongo.",
+        ingredients: ["Papas a la francesa", "Butifarra", "Chorizo", "Carne", "Pollo", "Cerdo", "Queso mozzarella fundido", "Tocineta", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salvajada-bacana",
+        name: "La Bacana (x3)",
+        category: "salvajadas",
+        categoryName: "Salvajadas",
+        price: 42000,
+        portion: "Comen 3 Personas",
+        badge: "Top Ventas",
+        desc: "Papas a la francesa, Butifarra, chorizo, carne, cerdo y pollo, salchicha, queso mozzarella fundido, lechuga, cebolla, tocineta, salsa de la casa y papa chongo.",
+        ingredients: ["Papas francesas", "Butifarra", "Chorizo", "Carne", "Cerdo", "Pollo", "Salchicha", "Queso mozzarella fundido", "Tocineta", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salvajada-tramacua",
+        name: "La Tramacúa (x4)",
+        category: "salvajadas",
+        categoryName: "Salvajadas",
+        price: 54000,
+        portion: "Comen 4 Personas",
+        badge: "¡La Favorita!",
+        desc: "Butifarra, chorizo, pollo, carne, salchicha, papas francesas, queso mozarella fundido, tocineta, lechuga, cebolla, salsa de tocineta y salsas de la casa.",
+        ingredients: ["Papas francesas", "Butifarra", "Chorizo", "Pollo", "Carne", "Salchicha", "Queso mozzarella fundido", "Tocineta", "Salsa de tocineta especial", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop"
+      },
+      {
+        id: "salvajada-xxl",
+        name: "La XXL (x5)",
+        category: "salvajadas",
+        categoryName: "Salvajadas",
+        price: 70000,
+        portion: "Comen 5 Personas",
+        badge: "Monstruosa x5",
+        desc: "Butifarra, chorizo, pollo, carne, papas francesas, salchicha, queso mozarella fundido, tocineta, lechuga, cebolla, salsa de tocineta y salsas de la casa.",
+        ingredients: ["Montaña papas francesas", "Butifarra", "Chorizo", "Pollo", "Carne", "Salchicha", "Queso mozzarella fundido x5", "Tocineta", "Salsa de tocineta", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop"
+      },
+
+      // --- SALCHIPAPAS ---
+      {
+        id: "salchipapa-clasica-gourmet",
+        name: "La Clásica Gourmet",
+        category: "salchipapas",
+        categoryName: "Salchipapas",
+        price: 13000,
+        portion: "1 Persona",
+        badge: "Clásica",
+        desc: "200gr de papas a la francesa, salchicha tradicional, lechuga, cebolla, salsas de la casa, queso costeño y papa chongo.",
+        ingredients: ["200g Papas francesas", "Salchicha tradicional", "Queso costeño", "Papa chongo", "Lechuga y cebolla", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1585109649139-366815a0d713?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salchipapa-salchimix",
+        name: "Salchimix",
+        category: "salchipapas",
+        categoryName: "Salchipapas",
+        price: 16000,
+        portion: "1 a 2 Personas",
+        badge: "Mixta",
+        desc: "200gr de papas a la francesa, butifarra, chorizo, salchicha, lechuga, cebolla, jamón, salsa de la casa y papa chongo.",
+        ingredients: ["200g Papas francesas", "Butifarra", "Chorizo", "Salchicha", "Jamón", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1576107232684-1279f3908594?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salchipapa-salchipollo",
+        name: "Salchipollo",
+        category: "salchipapas",
+        categoryName: "Salchipapas",
+        price: 16000,
+        portion: "1 a 2 Personas",
+        badge: "Con Pollo",
+        desc: "200gr de papas francesas, salchicha, pechuga de pollo, queso costeño, lechuga, cebolla, salsa de la casa y papa chongo.",
+        ingredients: ["200g Papas francesas", "Salchicha", "Pechuga de pollo", "Queso costeño", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1585109649139-366815a0d713?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salchipapa-salchicarne",
+        name: "Salchicarne",
+        category: "salchipapas",
+        categoryName: "Salchipapas",
+        price: 16000,
+        portion: "1 a 2 Personas",
+        badge: "Con Carne",
+        desc: "200gr de papas francesas, salchicha, carne, queso costeño, lechuga, cebolla, salsa de la casa y papa chongo.",
+        ingredients: ["200g Papas francesas", "Salchicha", "Carne tierna", "Queso costeño", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1576107232684-1279f3908594?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "salchipapa-goloxa",
+        name: "La Goloxa",
+        category: "salchipapas",
+        categoryName: "Salchipapas",
+        price: 23000,
+        portion: "2 Personas",
+        badge: "Especial Golosa",
+        desc: "200gr de papas francesas, chorizo, butifarra, carne desmechada y pollo desmechado, queso costeño, lechuga, cebolla, salsa de la casa, papa chongo y vegetales grillet.",
+        ingredients: ["200g Papas francesas", "Chorizo y Butifarra", "Carne desmechada", "Pollo desmechado", "Queso costeño", "Vegetales grillet", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?q=80&w=900&auto=format&fit=crop"
+      },
+
+      // --- HOT DOGS ---
+      {
+        id: "hotdog-franke",
+        name: "Franke",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 7500,
+        portion: "1 Persona",
+        badge: "Económico",
+        desc: "Pan, salchicha premium, vegetales, salsas de la casa, papa chongo y queso mozarella.",
+        ingredients: ["Pan caliente", "Salchicha premium", "Queso mozzarella", "Papa chongo", "Vegetales", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-plancha",
+        name: "Perro a la Plancha",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 8000,
+        portion: "1 Persona",
+        badge: "Queso Costeño",
+        desc: "Pan, salchicha premium, queso costeño, vegetales, salsas de la casa y papa chongo.",
+        ingredients: ["Pan suave", "Salchicha premium a la plancha", "Queso costeño rallado", "Papa chongo", "Vegetales", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-medio-suizo",
+        name: "Medio Suizo",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 9000,
+        portion: "1 Persona",
+        badge: "Salchicha Suiza",
+        desc: "Pan, media salchicha suiza, queso mozarella, vegetales, salsas de la casa y papa chongo.",
+        ingredients: ["Pan", "Media salchicha suiza", "Queso mozzarella", "Papa chongo", "Vegetales", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-gemelo",
+        name: "Perro Gemelo",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 11000,
+        portion: "1 Persona",
+        badge: "Doble Salchicha",
+        desc: "Pan, 2 salchichas premium, queso costeño, vegetales, salsas de la casa y papa chongo.",
+        ingredients: ["Pan", "2 Salchichas premium", "Queso costeño", "Papa chongo", "Vegetales", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1627059173070-7694f47953ea?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-perripollo",
+        name: "Perripollo",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 12000,
+        portion: "1 Persona",
+        badge: "Con Pechuga",
+        desc: "Pan, salchicha premium, pechuga de pollo, vegetales, salsas de la casa, papa chongo y queso mozarella.",
+        ingredients: ["Pan", "Salchicha premium", "Pechuga de pollo jugosa", "Queso mozzarella", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-delizuizo",
+        name: "Delizuizo",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 16000,
+        portion: "1 Persona",
+        badge: "Suiza Entera",
+        desc: "Pan, salchicha suiza completa, queso mozarella, vegetales, salsas de la casa y papa chongo.",
+        ingredients: ["Pan", "Salchicha suiza completa", "Queso mozzarella", "Papa chongo", "Vegetales", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-special",
+        name: "Special Hotdog",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 17000,
+        portion: "1 Persona",
+        badge: "Carne + Pollo",
+        desc: "Pan, media salchicha suiza, queso mozarella, carne, pollo, tocineta, vegetales, salsas de la casa y papa chongo.",
+        ingredients: ["Pan", "Media suiza", "Carne", "Pollo", "Tocineta", "Queso mozzarella", "Papa chongo", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1627059173070-7694f47953ea?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "hotdog-master",
+        name: "Master Hotdog",
+        category: "hotdogs",
+        categoryName: "Hot Dogs",
+        price: 30000,
+        portion: "Para 2 Personas",
+        badge: "Super Master",
+        desc: "Super pan, pollo, carne, cerdo, chorizo butifarra, suiza, jamón, queso, salsas de la casa, papa chongo y papas francesas.",
+        ingredients: ["Super pan", "Pollo, carne y cerdo", "Chorizo y butifarra", "Salchicha suiza", "Jamón y queso", "Papa chongo", "Papas francesas incluidas"],
+        image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?q=80&w=900&auto=format&fit=crop"
+      },
+
+      // --- BURGERS ---
+      {
+        id: "burger-clasica",
+        name: "La Clásica",
+        category: "burgers",
+        categoryName: "Burgers",
+        price: 13000,
+        portion: "1 Persona",
+        badge: "150g Res",
+        desc: "150 gr de carne de res seleccionada, queso mozzarella, pan artesanal, vegetales frescos, jamón y salsas de la casa.",
+        ingredients: ["150g Carne de res", "Queso mozzarella", "Pan artesanal", "Vegetales frescos", "Jamón", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "burger-doublemeat",
+        name: "Doublemeat",
+        category: "burgers",
+        categoryName: "Burgers",
+        price: 25000,
+        portion: "1 Persona",
+        badge: "300g Res",
+        desc: "300 gr de carne de res seleccionada, queso mozzarella, cebolla caramelizada, vegetales frescos, pan brioche, queso fundido y tocineta.",
+        ingredients: ["300g Doble carne de res", "Queso fundido + mozzarella", "Tocineta ahumada", "Cebolla caramelizada", "Pan brioche"],
+        image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "burger-master",
+        name: "Burguer Master",
+        category: "burgers",
+        categoryName: "Burgers",
+        price: 38000,
+        portion: "1 Persona (Monstruosa)",
+        badge: "La Reina BITHOUSE",
+        desc: "150 gr de carne de res, pechuga, chicharrón, medio chorizo suizo, queso costeño frito, patacón de plátano maduro, huevo frito, tocineta y salsas de la casa.",
+        ingredients: ["150g Res + Pechuga", "Chicharrón crocante", "Medio chorizo suizo", "Queso costeño frito", "Patacón de plátano maduro", "Huevo frito", "Tocineta", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=900&auto=format&fit=crop"
+      },
+
+      // --- PATACONES ---
+      {
+        id: "patacon-power",
+        name: "Patacón Power",
+        category: "patacones",
+        categoryName: "Patacones",
+        price: 18000,
+        portion: "1 a 2 Personas",
+        badge: "Con Huevo Frito",
+        desc: "Patacón de plátano verde, pollo, carne, chorizo y butifarra, salsas de la casa, vegetales grillet, queso costeño y huevo frito.",
+        ingredients: ["Patacón verde", "Pollo y carne", "Chorizo y butifarra", "Vegetales grillet", "Queso costeño", "Huevo frito"],
+        image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=900&auto=format&fit=crop"
+      },
+
+      // --- CHUZOS DESGRANADOS ---
+      {
+        id: "chuzo-chicken-bollo",
+        name: "Chicken Bollo",
+        category: "chuzos",
+        categoryName: "Chuzos Desgranados",
+        price: 18000,
+        portion: "1 a 2 Personas",
+        badge: "Con Bollo Limpio",
+        desc: "Bollo blanco, pechuga a la parrilla, queso costeño, papa chongo, lechuga, cebolla y salsas de la casa.",
+        ingredients: ["Bollo blanco suave", "Pechuga de pollo a la parrilla", "Queso costeño", "Papa chongo crocante", "Lechuga y cebolla", "Salsas de la casa"],
+        image: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?q=80&w=900&auto=format&fit=crop"
+      },
+
+      // --- BEBIDAS ---
+      {
+        id: "bebida-coca-personal",
+        name: "Coca-Cola Personal",
+        category: "bebidas",
+        categoryName: "Bebidas",
+        price: 4000,
+        portion: "Personal",
+        badge: "Original",
+        desc: "Coca-Cola personal helada.",
+        ingredients: ["Coca-Cola personal"],
+        image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=900&auto=format&fit=crop"
+      },
+      {
+        id: "bebida-coca-1-5",
+        name: "Coca-Cola 1.5 LT",
+        category: "bebidas",
+        categoryName: "Bebidas",
+        price: 8000,
+        portion: "Familiar (1.5L)",
+        badge: "Para Compartir",
+        desc: "Coca-Cola tamaño familiar 1.5 Litros, ideal para acompañar tus salvajadas.",
+        ingredients: ["Coca-Cola botella 1.5L"],
+        image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=900&auto=format&fit=crop"
+      }
+    ];
+
+    const CONFIG = {
+      name: "BITHOUSE",
+      whatsappNumber: "573146096158",
+      adminPin: "1234",
+      storageKeyMenu: "BITHOUSE_MENU_STORAGE_V2",
+      storageKeyAdmin: "BITHOUSE_IS_ADMIN"
+    };
+
+    // OBTENER MENÚ DINÁMICO DE LOCALSTORAGE
+    function getStoredMenu() {
+      const saved = localStorage.getItem(CONFIG.storageKeyMenu);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Error al leer menú:", e);
+        }
+      }
+      return DEFAULT_MENU;
+    }
+
+    function saveMenuToStorage(menu) {
+      localStorage.setItem(CONFIG.storageKeyMenu, JSON.stringify(menu));
+    }
+
+    let BITHOUSE_MENU = getStoredMenu();
+
+    // ESTADO GENERAL
+    const App = {
+      currentProductId: "salvajada-tramacua",
+      currentFilter: "todos",
+      heroQty: 1,
+      cart: [],
+      consumptionMode: "mesa", // "mesa" o "domicilio"
+      tableNumber: "",
+      isAdmin: localStorage.getItem(CONFIG.storageKeyAdmin) === "true",
+
+      getCurrentProduct() {
+        return BITHOUSE_MENU.find(p => p.id === this.currentProductId) || BITHOUSE_MENU[0];
+      },
+
+      setProduct(id, shouldScroll = false) {
+        this.currentProductId = id;
+        this.heroQty = 1;
+        renderHero(true);
+        renderMenuCards();
+
+        if (shouldScroll) {
+          const heroEl = document.getElementById("heroSpotlight");
+          if (heroEl) heroEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      },
+
+      setFilter(cat) {
+        this.currentFilter = cat;
+        renderCategoryTabs();
+        renderMenuCards();
+      },
+
+      addToCart(product, qty = 1) {
+        const existing = this.cart.find(item => item.id === product.id);
+        if (existing) {
+          existing.qty += qty;
+        } else {
+          this.cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            qty: qty
+          });
+        }
+        this.updateCartUI();
+        showToast(`¡Añadido! ${qty}x ${product.name}`);
+      },
+
+      updateCartQty(id, delta) {
+        const item = this.cart.find(i => i.id === id);
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) {
+          this.cart = this.cart.filter(i => i.id !== id);
+        }
+        this.updateCartUI();
+      },
+
+      getCartTotal() {
+        return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      },
+
+      getCartCount() {
+        return this.cart.reduce((sum, item) => sum + item.qty, 0);
+      },
+
+      updateCartUI() {
+        const count = this.getCartCount();
+        const badge = document.getElementById("cartCountBadge");
+        const badgeMobile = document.getElementById("cartCountMobile");
+
+        if (badge) {
+          badge.textContent = count;
+          badge.classList.toggle("hidden", count === 0);
+        }
+        if (badgeMobile) {
+          badgeMobile.textContent = count;
+          badgeMobile.classList.toggle("hidden", count === 0);
+        }
+        renderCartDrawer();
+      }
+    };
+
+    const formatCOP = (val) => {
+      return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        maximumFractionDigits: 0
+      }).format(val);
+    };
+
+    // CONTROL DE MODALIDAD (MESA VS DOMICILIO)
+    function setConsumptionMode(mode) {
+      App.consumptionMode = mode;
+      const isMesa = mode === "mesa";
+
+      // Botones Navbar
+      const navBtnMesa = document.getElementById("navBtnMesa");
+      const navBtnDom = document.getElementById("navBtnDomicilio");
+      if (navBtnMesa && navBtnDom) {
+        navBtnMesa.className = isMesa 
+          ? "px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition bg-amber-500 text-black shadow" 
+          : "px-3.5 py-1.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center gap-1.5 transition";
+        navBtnDom.className = !isMesa 
+          ? "px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition bg-amber-500 text-black shadow" 
+          : "px-3.5 py-1.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center gap-1.5 transition";
+      }
+
+      // Banner Superior
+      const switchBtnMesa = document.getElementById("switchBtnMesa");
+      const switchBtnDom = document.getElementById("switchBtnDomicilio");
+      const tableInputContainer = document.getElementById("tableInputContainer");
+      const modeIconBanner = document.getElementById("modeIconBanner");
+      const modeTitleBanner = document.getElementById("modeTitleBanner");
+      const modeDescBanner = document.getElementById("modeDescBanner");
+
+      if (switchBtnMesa && switchBtnDom) {
+        switchBtnMesa.className = isMesa
+          ? "px-4 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition bg-amber-500 text-black shadow-lg"
+          : "px-4 py-2.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center justify-center gap-2 transition";
+        switchBtnDom.className = !isMesa
+          ? "px-4 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition bg-amber-500 text-black shadow-lg"
+          : "px-4 py-2.5 rounded-xl text-xs font-bold text-neutral-400 hover:text-white flex items-center justify-center gap-2 transition";
+      }
+
+      if (tableInputContainer) tableInputContainer.classList.toggle("hidden", !isMesa);
+
+      if (modeTitleBanner) {
+        modeTitleBanner.textContent = isMesa ? "Comer en el Local (En Mesa)" : "Para Llevar / Domicilio";
+      }
+      if (modeDescBanner) {
+        modeDescBanner.textContent = isMesa 
+          ? "Seleccionado: Te atenderemos directamente en tu mesa." 
+          : "Seleccionado: Te enviaremos tu pedido caliente y listo hasta tu casa.";
+      }
+      if (modeIconBanner) {
+        modeIconBanner.className = isMesa ? "fa-solid fa-utensils" : "fa-solid fa-motorcycle";
+      }
+
+      // Actualizar Hero Badge
+      const heroModeLabel = document.getElementById("heroModeLabelText");
+      if (heroModeLabel) {
+        heroModeLabel.innerHTML = isMesa 
+          ? `Modalidad: <strong>En Mesa</strong> ${App.tableNumber ? '(Mesa ' + App.tableNumber + ')' : ''}`
+          : `Modalidad: <strong>Para Llevar / Domicilio</strong>`;
+      }
+
+      // Actualizar Formulario en Carrito
+      const cartBtnMesa = document.getElementById("cartModeBtnMesa");
+      const cartBtnDom = document.getElementById("cartModeBtnDomicilio");
+      const cartFieldMesa = document.getElementById("cartFieldMesa");
+      const cartFieldDom = document.getElementById("cartFieldDomicilio");
+      const cartFormTitle = document.getElementById("cartFormTitle");
+      const cartFormIcon = document.getElementById("cartFormIcon");
+
+      if (cartBtnMesa && cartBtnDom) {
+        cartBtnMesa.className = isMesa 
+          ? "py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition bg-amber-500 text-black"
+          : "py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition text-neutral-400 hover:text-white";
+        cartBtnDom.className = !isMesa
+          ? "py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition bg-amber-500 text-black"
+          : "py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition text-neutral-400 hover:text-white";
+      }
+
+      if (cartFieldMesa) cartFieldMesa.classList.toggle("hidden", !isMesa);
+      if (cartFieldDom) cartFieldDom.classList.toggle("hidden", isMesa);
+      if (cartFormTitle) cartFormTitle.textContent = isMesa ? "Datos para atención en mesa" : "Datos para la entrega del domicilio";
+      if (cartFormIcon) cartFormIcon.className = isMesa ? "fa-solid fa-chair" : "fa-solid fa-motorcycle";
+
+      showToast(`Modalidad cambiada: ${isMesa ? "En Mesa" : "Para Llevar / Domicilio"}`);
+    }
+
+    function updateGlobalTableNumber(val) {
+      App.tableNumber = val.trim();
+      const clientTableInput = document.getElementById("clientTable");
+      if (clientTableInput && clientTableInput.value !== val) {
+        clientTableInput.value = val;
+      }
+      const heroModeLabel = document.getElementById("heroModeLabelText");
+      if (heroModeLabel && App.consumptionMode === "mesa") {
+        heroModeLabel.innerHTML = `Modalidad: <strong>En Mesa</strong> ${App.tableNumber ? '(Mesa ' + App.tableNumber + ')' : ''}`;
+      }
+    }
+
+    function syncTableInput(val) {
+      App.tableNumber = val.trim();
+      const globalInput = document.getElementById("globalTableNumber");
+      if (globalInput && globalInput.value !== val) {
+        globalInput.value = val;
+      }
+    }
+
+    // RENDER HERO
+    function renderHero(animate = false) {
+      const p = App.getCurrentProduct();
+      const imgEl = document.getElementById("heroImage");
+      const spinnerEl = document.getElementById("heroSpinner");
+
+      if (imgEl) {
+        if (animate) {
+          imgEl.classList.add("opacity-20", "scale-95");
+          if (spinnerEl) spinnerEl.classList.remove("hidden");
+        }
+
+        const temp = new Image();
+        temp.src = p.image;
+        temp.onload = () => {
+          imgEl.src = p.image;
+          imgEl.alt = p.name;
+          imgEl.classList.remove("opacity-20", "scale-95");
+          if (spinnerEl) spinnerEl.classList.add("hidden");
+        };
+        temp.onerror = () => {
+          imgEl.src = "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop";
+          imgEl.classList.remove("opacity-20", "scale-95");
+          if (spinnerEl) spinnerEl.classList.add("hidden");
+        };
+      }
+
+      document.getElementById("heroCategoryBadge").textContent = p.categoryName || p.category;
+      document.getElementById("heroBadgeTag").textContent = p.badge || "Especial";
+      document.getElementById("heroPortion").innerHTML = `<i class="fa-solid fa-users text-amber-400 mr-1.5"></i> ${p.portion || '1 Persona'}`;
+      document.getElementById("heroTitle").textContent = p.name;
+      document.getElementById("heroDescription").textContent = p.desc;
+      document.getElementById("heroPrice").textContent = formatCOP(p.price * App.heroQty);
+      document.getElementById("heroQty").textContent = App.heroQty;
+
+      // Botón editar visible solo si es admin
+      const editBtn = document.getElementById("heroEditBtn");
+      if (editBtn) editBtn.classList.toggle("hidden", !App.isAdmin);
+
+      const chipsEl = document.getElementById("heroIngredientsChips");
+      if (chipsEl) {
+        const ingredients = p.ingredients || p.desc.split(", ");
+        chipsEl.innerHTML = ingredients.map(ing => `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 border border-neutral-800 rounded-lg text-xs text-neutral-300">
+            <i class="fa-solid fa-check text-amber-400 text-[10px]"></i> ${ing}
+          </span>
+        `).join("");
+      }
+    }
+
+    // RENDER TABS
+    function renderCategoryTabs() {
+      const categories = [
+        { id: "todos", label: "🔥 Todo el Menú", count: BITHOUSE_MENU.length },
+        { id: "salvajadas", label: "👑 Salvajadas", count: BITHOUSE_MENU.filter(p => p.category === "salvajadas").length },
+        { id: "salchipapas", label: "🍟 Salchipapas", count: BITHOUSE_MENU.filter(p => p.category === "salchipapas").length },
+        { id: "hotdogs", label: "🌭 Hot Dogs", count: BITHOUSE_MENU.filter(p => p.category === "hotdogs").length },
+        { id: "burgers", label: "🍔 Burgers", count: BITHOUSE_MENU.filter(p => p.category === "burgers").length },
+        { id: "patacones", label: "🍌 Patacones", count: BITHOUSE_MENU.filter(p => p.category === "patacones").length },
+        { id: "chuzos", label: "🌽 Chuzos Desgranados", count: BITHOUSE_MENU.filter(p => p.category === "chuzos").length },
+        { id: "bebidas", label: "🥤 Bebidas", count: BITHOUSE_MENU.filter(p => p.category === "bebidas").length },
+      ];
+
+      const container = document.getElementById("categoryTabsContainer");
+      if (!container) return;
+
+      container.innerHTML = categories.map(cat => {
+        const isActive = App.currentFilter === cat.id;
+        return `
+          <button 
+            type="button" 
+            onclick="App.setFilter('${cat.id}')"
+            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition flex items-center gap-2 border 
+            ${isActive 
+              ? 'bg-amber-500 text-black border-amber-400 shadow-lg shadow-amber-500/20' 
+              : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-700 hover:text-white'}"
+          >
+            <span>${cat.label}</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] ${isActive ? 'bg-black text-amber-400' : 'bg-neutral-800 text-neutral-400'} font-black">
+              ${cat.count}
+            </span>
+          </button>
+        `;
+      }).join("");
+
+      const badgeCount = document.getElementById("categoryCountBadge");
+      if (badgeCount) {
+        const currentCatObj = categories.find(c => c.id === App.currentFilter);
+        badgeCount.textContent = currentCatObj ? `${currentCatObj.label} (${currentCatObj.count} platos)` : "Todos los platos";
+      }
+    }
+
+    // RENDER TARJETAS
+    function renderMenuCards() {
+      const container = document.getElementById("menuCardsGrid");
+      if (!container) return;
+
+      const filtered = App.currentFilter === "todos"
+        ? BITHOUSE_MENU
+        : BITHOUSE_MENU.filter(p => p.category === App.currentFilter);
+
+      container.innerHTML = filtered.map(p => {
+        const isSelected = p.id === App.currentProductId;
+
+        return `
+          <div 
+            onclick="App.setProduct('${p.id}', true)"
+            class="group relative bg-neutral-900/90 rounded-2xl border transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between 
+            ${isSelected 
+              ? 'border-amber-500 ring-2 ring-amber-500/40 shadow-[0_0_25px_rgba(245,158,11,0.25)] translate-y-[-2px]' 
+              : 'border-neutral-800 hover:border-neutral-700 hover:bg-neutral-850'}"
+          >
+            <div class="relative h-48 w-full overflow-hidden bg-black">
+              <img 
+                src="${p.image}" 
+                alt="${p.name}" 
+                loading="lazy"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=900&auto=format&fit=crop'"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-black/40"></div>
+
+              <div class="absolute top-3 left-3 flex gap-1.5">
+                <span class="px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider backdrop-blur bg-black/70 border border-white/10 text-amber-400">
+                  ${p.badge || 'Delicia'}
+                </span>
+              </div>
+
+              ${App.isAdmin ? `
+                <button 
+                  onclick="event.stopPropagation(); openProductEditModal('${p.id}')"
+                  class="absolute top-3 right-3 px-2 py-1 rounded-lg bg-black/80 hover:bg-amber-500 text-amber-400 hover:text-black border border-amber-500/40 text-xs font-bold transition flex items-center gap-1 z-10"
+                  title="Editar plato"
+                >
+                  <i class="fa-solid fa-pen"></i> Editar
+                </button>
+              ` : (isSelected ? `
+                <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500 text-black text-[10px] font-black uppercase flex items-center gap-1 shadow-md">
+                  <i class="fa-solid fa-eye text-[9px]"></i> Viendo ahora
+                </div>
+              ` : `
+                <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/60 text-neutral-300 text-[10px] font-bold">
+                  ${p.categoryName || p.category}
+                </div>
+              `)}
+
+              <div class="absolute bottom-2.5 left-3 px-2 py-0.5 rounded bg-black/80 backdrop-blur text-xs font-bold text-neutral-300">
+                <i class="fa-solid fa-users text-amber-400 text-[10px] mr-1"></i> ${p.portion || '1 Persona'}
+              </div>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-lg text-white group-hover:text-amber-400 transition mb-1 leading-snug">
+                  ${p.name}
+                </h3>
+                <p class="text-neutral-400 text-xs leading-relaxed line-clamp-2 mb-4">
+                  ${p.desc}
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-neutral-800/80 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] uppercase font-bold text-neutral-500 block">Precio</span>
+                    <span class="text-xl font-black text-amber-400 tracking-tight">
+                      ${formatCOP(p.price)}
+                    </span>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    onclick="event.stopPropagation(); App.addToCart(BITHOUSE_MENU.find(x => x.id === '${p.id}'), 1)"
+                    class="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-black border border-amber-500/30 font-bold text-xs flex items-center gap-1.5 transition btn-press"
+                  >
+                    <i class="fa-solid fa-cart-plus"></i>
+                    <span>Añadir</span>
+                  </button>
+                </div>
+
+                <!-- Botón claro de Pedir por WhatsApp -->
+                <button 
+                  type="button"
+                  onclick="event.stopPropagation(); orderItemWhatsApp('${p.id}')"
+                  class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow transition btn-press"
+                >
+                  <i class="fa-brands fa-whatsapp text-sm"></i>
+                  <span>Pedir por WhatsApp</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function changeHeroQty(delta) {
+      const newQ = App.heroQty + delta;
+      if (newQ >= 1 && newQ <= 20) {
+        App.heroQty = newQ;
+        const p = App.getCurrentProduct();
+        document.getElementById("heroQty").textContent = App.heroQty;
+        document.getElementById("heroPrice").textContent = formatCOP(p.price * App.heroQty);
+      }
+    }
+
+    function addCurrentHeroToCart() {
+      const p = App.getCurrentProduct();
+      App.addToCart(p, App.heroQty);
+    }
+
+    // PEDIDOS DIRECTOS POR WHATSAPP (CON MODALIDAD MESA O DOMICILIO)
+    function orderCurrentHeroWhatsApp() {
+      const p = App.getCurrentProduct();
+      const qty = App.heroQty;
+      const total = p.price * qty;
+      const isMesa = App.consumptionMode === "mesa";
+      const tableInfo = App.tableNumber ? `Mesa: *${App.tableNumber}*` : "Mesa: *(Indicaré mi mesa al mesero)*";
+
+      const message = `¡Hola *${CONFIG.name}*! 👋🍔\n\n` +
+        `Quiero hacer un pedido desde el menú digital:\n\n` +
+        `📌 *MODALIDAD:* ${isMesa ? `🍽️ *PARA COMER EN EL LOCAL* (${tableInfo})` : `🛵 *PARA LLEVAR / A DOMICILIO*`}\n\n` +
+        `• *${qty}x ${p.name}*\n` +
+        `  Precio: *${formatCOP(total)}*\n` +
+        `  Detalles: ${p.desc}\n\n` +
+        (!isMesa ? `📍 *Dirección de entrega:* \n👤 *Nombre:* \n💳 *Método de pago (Nequi / Efectivo):* \n\n` : `👤 *Nombre:* \n💳 *Método de pago:* \n\n`) +
+        `¿Me confirman la orden, por favor? 🙌`;
+
+      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    function orderItemWhatsApp(productId) {
+      const p = BITHOUSE_MENU.find(item => item.id === productId);
+      if (!p) return;
+
+      const isMesa = App.consumptionMode === "mesa";
+      const tableInfo = App.tableNumber ? `Mesa: *${App.tableNumber}*` : "Mesa: *(Por confirmar)*";
+
+      const message = `¡Hola *${CONFIG.name}*! 👋🍔\n\n` +
+        `Deseo ordenar este plato desde su menú digital:\n\n` +
+        `📌 *MODALIDAD:* ${isMesa ? `🍽️ *PARA COMER EN EL LOCAL* (${tableInfo})` : `🛵 *PARA LLEVAR / A DOMICILIO*`}\n\n` +
+        `👉 *1x ${p.name}*\n` +
+        `💰 Precio: *${formatCOP(p.price)}*\n` +
+        `📝 Ingredientes: ${p.desc}\n\n` +
+        (!isMesa ? `📍 *Dirección de entrega:* \n👤 *Nombre:* \n💳 *Forma de pago:* \n\n` : `👤 *Nombre:* \n💳 *Forma de pago:* \n\n`) +
+        `Quedo atento a su confirmación. ¡Muchas gracias!`;
+
+      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    // CHECKOUT CARRITO COMPLETO POR WHATSAPP
+    function checkoutCartWhatsApp() {
+      if (App.cart.length === 0) return;
+
+      const isMesa = App.consumptionMode === "mesa";
+      const name = document.getElementById("clientName")?.value.trim() || "Cliente";
+      const table = document.getElementById("clientTable")?.value.trim() || App.tableNumber || "Por confirmar";
+      const address = document.getElementById("clientAddress")?.value.trim() || "Por confirmar";
+      const payment = document.getElementById("clientPayment")?.value || "Nequi";
+      const notes = document.getElementById("clientNotes")?.value.trim() || "";
+
+      let itemsText = "";
+      App.cart.forEach((i, idx) => {
+        itemsText += `${idx + 1}. *${i.qty}x ${i.name}* (${formatCOP(i.price * i.qty)})\n`;
+      });
+
+      const message = `¡Hola *${CONFIG.name}*! 🔥👋\n` +
+        `Deseo confirmar el siguiente pedido desde su menú digital:\n\n` +
+        `📌 *MODALIDAD:* ${isMesa ? `🍽️ *PARA COMER EN EL LOCAL (MESA: ${table})*` : `🛵 *PARA LLEVAR / A DOMICILIO*`}\n\n` +
+        `🛒 *RESUMEN DE MI ORDEN:*\n` +
+        `${itemsText}\n` +
+        `💰 *TOTAL A PAGAR: ${formatCOP(App.getCartTotal())}*\n\n` +
+        `👤 *Cliente:* ${name}\n` +
+        (isMesa ? `🪑 *Mesa Número:* ${table}\n` : `📍 *Dirección Domicilio:* ${address}\n`) +
+        `💳 *Método de Pago:* ${payment}\n` +
+        (notes ? `📝 *Observaciones:* ${notes}\n\n` : `\n`) +
+        `¿Me confirman recepción de la comanda? ¡Muchas gracias! 🙌`;
+
+      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    // CARRITO SLIDE-OVER
+    function toggleCart(forceOpen) {
+      const drawer = document.getElementById("cartDrawer");
+      const backdrop = document.getElementById("cartBackdrop");
+      if (!drawer || !backdrop) return;
+
+      const shouldOpen = forceOpen !== undefined ? forceOpen : drawer.classList.contains("translate-x-full");
+
+      if (shouldOpen) {
+        drawer.classList.remove("translate-x-full");
+        backdrop.classList.remove("hidden", "opacity-0");
+        backdrop.classList.add("opacity-100");
+        document.body.style.overflow = "hidden";
+      } else {
+        drawer.classList.add("translate-x-full");
+        backdrop.classList.remove("opacity-100");
+        backdrop.classList.add("opacity-0");
+        setTimeout(() => backdrop.classList.add("hidden"), 300);
+        document.body.style.overflow = "";
+      }
+    }
+
+    function renderCartDrawer() {
+      const listEl = document.getElementById("cartItemsList");
+      const emptyEl = document.getElementById("cartEmptyState");
+      const totalEl = document.getElementById("cartGrandTotal");
+      const checkoutBtn = document.getElementById("cartCheckoutBtn");
+
+      if (!listEl) return;
+      const total = App.getCartTotal();
+
+      if (App.cart.length === 0) {
+        listEl.innerHTML = "";
+        if (emptyEl) emptyEl.classList.remove("hidden");
+        if (checkoutBtn) checkoutBtn.setAttribute("disabled", "true");
+      } else {
+        if (emptyEl) emptyEl.classList.add("hidden");
+        if (checkoutBtn) checkoutBtn.removeAttribute("disabled");
+
+        listEl.innerHTML = App.cart.map(item => `
+          <div class="flex items-center gap-3 p-3 bg-neutral-900 border border-neutral-800 rounded-xl">
+            <img src="${item.image}" alt="${item.name}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=900&auto=format&fit=crop'">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-bold text-white truncate">${item.name}</h4>
+              <span class="text-xs text-amber-400 font-bold">${formatCOP(item.price)}</span>
+              <div class="flex items-center gap-2 mt-1">
+                <button type="button" onclick="App.updateCartQty('${item.id}', -1)" class="w-6 h-6 rounded bg-neutral-800 text-white flex items-center justify-center text-xs">-</button>
+                <span class="text-xs font-bold text-white">${item.qty}</span>
+                <button type="button" onclick="App.updateCartQty('${item.id}', 1)" class="w-6 h-6 rounded bg-neutral-800 text-white flex items-center justify-center text-xs">+</button>
+              </div>
+            </div>
+            <div class="text-right">
+              <button type="button" onclick="App.updateCartQty('${item.id}', -999)" class="text-neutral-500 hover:text-red-400 p-1 text-xs">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+              <span class="text-sm font-black text-white block mt-1">${formatCOP(item.price * item.qty)}</span>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      if (totalEl) totalEl.textContent = formatCOP(total);
+    }
+
+    // ==========================================
+    // SISTEMA DE ROLES (ADMINISTRADOR Y ATENCIÓN)
+    // ==========================================
+    function handleAdminAuthClick() {
+      if (App.isAdmin) {
+        showToast("Ya estás en Modo Administrador");
+      } else {
+        document.getElementById("adminAuthModal").classList.remove("hidden");
+        document.getElementById("adminPinInput").value = "";
+        document.getElementById("adminPinError").classList.add("hidden");
+        setTimeout(() => document.getElementById("adminPinInput").focus(), 100);
+      }
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById("adminAuthModal").classList.add("hidden");
+    }
+
+    function submitAdminPin() {
+      const pin = document.getElementById("adminPinInput").value.trim();
+      if (pin === CONFIG.adminPin) {
+        App.isAdmin = true;
+        localStorage.setItem(CONFIG.storageKeyAdmin, "true");
+        closeAdminAuthModal();
+        updateAdminView();
+        showToast("¡Modo Administrador activado con éxito! 🛠️");
+      } else {
+        document.getElementById("adminPinError").classList.remove("hidden");
+      }
+    }
+
+    function logoutAdmin() {
+      App.isAdmin = false;
+      localStorage.setItem(CONFIG.storageKeyAdmin, "false");
+      updateAdminView();
+      showToast("Has salido del Modo Administrador (Modo Atención al Cliente activo)");
+    }
+
+    function updateAdminView() {
+      const topBar = document.getElementById("adminTopBar");
+      const adminBtnText = document.getElementById("adminBtnText");
+
+      if (topBar) topBar.classList.toggle("hidden", !App.isAdmin);
+      if (adminBtnText) adminBtnText.textContent = App.isAdmin ? "Admin (Activo)" : "Admin";
+
+      renderHero(false);
+      renderMenuCards();
+    }
+
+    // MODAL DE EDICIÓN DE PRODUCTO (ADMIN)
+    function editCurrentHeroProduct() {
+      openProductEditModal(App.currentProductId);
+    }
+
+    function openProductEditModal(productId) {
+      const modal = document.getElementById("productEditModal");
+      const title = document.getElementById("editModalTitle");
+      const idInput = document.getElementById("editProductId");
+      const nameInput = document.getElementById("editProductName");
+      const priceInput = document.getElementById("editProductPrice");
+      const catInput = document.getElementById("editProductCategory");
+      const imgInput = document.getElementById("editProductImage");
+      const portionInput = document.getElementById("editProductPortion");
+      const descInput = document.getElementById("editProductDesc");
+
+      if (productId) {
+        const p = BITHOUSE_MENU.find(item => item.id === productId);
+        if (!p) return;
+
+        title.textContent = `Editar Plato: ${p.name}`;
+        idInput.value = p.id;
+        nameInput.value = p.name;
+        priceInput.value = p.price;
+        catInput.value = p.category;
+        imgInput.value = p.image;
+        portionInput.value = p.portion || "";
+        descInput.value = p.desc;
+        previewEditImage(p.image);
+      } else {
+        // Crear nuevo plato
+        title.textContent = "Agregar Nuevo Plato al Menú";
+        idInput.value = "nuevo-" + Date.now();
+        nameInput.value = "";
+        priceInput.value = 15000;
+        catInput.value = "salchipapas";
+        imgInput.value = "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=900&auto=format&fit=crop";
+        portionInput.value = "1 Persona";
+        descInput.value = "";
+        previewEditImage(imgInput.value);
+      }
+
+      modal.classList.remove("hidden");
+    }
+
+    function closeProductEditModal() {
+      document.getElementById("productEditModal").classList.add("hidden");
+    }
+
+    function previewEditImage(url) {
+      const preview = document.getElementById("editImagePreview");
+      if (preview && url) {
+        preview.src = url;
+      }
+    }
+
+    function saveProductEdit() {
+      const id = document.getElementById("editProductId").value;
+      const name = document.getElementById("editProductName").value.trim();
+      const price = parseInt(document.getElementById("editProductPrice").value) || 0;
+      const category = document.getElementById("editProductCategory").value;
+      const image = document.getElementById("editProductImage").value.trim();
+      const portion = document.getElementById("editProductPortion").value.trim();
+      const desc = document.getElementById("editProductDesc").value.trim();
+
+      if (!name || price <= 0) {
+        alert("Por favor ingresa un nombre y precio válido.");
+        return;
+      }
+
+      const existingIndex = BITHOUSE_MENU.findIndex(p => p.id === id);
+      if (existingIndex > -1) {
+        // Actualizar existente
+        BITHOUSE_MENU[existingIndex].name = name;
+        BITHOUSE_MENU[existingIndex].price = price;
+        BITHOUSE_MENU[existingIndex].category = category;
+        BITHOUSE_MENU[existingIndex].categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+        BITHOUSE_MENU[existingIndex].image = image;
+        BITHOUSE_MENU[existingIndex].portion = portion;
+        BITHOUSE_MENU[existingIndex].desc = desc;
+      } else {
+        // Insertar nuevo
+        BITHOUSE_MENU.unshift({
+          id: id,
+          name: name,
+          category: category,
+          categoryName: category.charAt(0).toUpperCase() + category.slice(1),
+          price: price,
+          portion: portion,
+          badge: "Nuevo",
+          desc: desc,
+          ingredients: desc.split(", "),
+          image: image
+        });
+      }
+
+      saveMenuToStorage(BITHOUSE_MENU);
+      closeProductEditModal();
+      renderCategoryTabs();
+      renderHero(false);
+      renderMenuCards();
+      showToast(`¡Plato "${name}" guardado exitosamente!`);
+    }
+
+    function resetMenuToDefault() {
+      if (confirm("¿Estás seguro de restablecer todos los platos a los valores originales del PDF?")) {
+        localStorage.removeItem(CONFIG.storageKeyMenu);
+        BITHOUSE_MENU = [...DEFAULT_MENU];
+        renderCategoryTabs();
+        renderHero(false);
+        renderMenuCards();
+        showToast("Menú restablecido a la versión original de BITHOUSE.");
+      }
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
+
+      const toast = document.createElement("div");
+      toast.className = "flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md bg-neutral-900 border border-amber-500/50 text-white text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0";
+      toast.innerHTML = `
+        <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <div class="flex-1">${msg}</div>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.remove("translate-y-4", "opacity-0"), 10);
+      setTimeout(() => {
+        toast.classList.add("translate-y-2", "opacity-0");
+        setTimeout(() => toast.remove(), 3000);
+      }, 3000);
+    }
+
+    // INICIALIZACIÓN
+    document.addEventListener("DOMContentLoaded", () => {
+      updateAdminView();
+      renderCategoryTabs();
+      renderHero(false);
+      renderMenuCards();
+      App.updateCartUI();
+      setConsumptionMode("mesa");
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          toggleCart(false);
+          closeAdminAuthModal();
+          closeProductEditModal();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
